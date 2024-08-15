@@ -201,57 +201,11 @@
                                 });
                             });
                         </script>
+                        <img src="{{ asset('assets/seleksi_lulius_1.png') }}" class="w-full rounded-lg" alt="">
+                        <img src="{{ asset('assets/informan.png') }}" class="w-full rounded-lg" alt="">
 
-                        {{-- <div class="grup">
-                            <div class="label font-bold inter mb-3 leading-[36px] text-black lg:text-[24px] text-[20px] ">
-                                ⭐Notifikasi
-                            </div>
-                            <div class="h-64 overflow-y-auto ">
-
-                                @foreach ($notif as $notifs)
-                                    <div
-                                        class="w-full h-[70px] border-2 border-black p-3 mt-3 bg-white rounded flex justify-between items-center">
-                                        <div class="flex items-center">
-                                            <div tabindex="0" aria-label="heart icon" role="img"
-                                                class="focus:outline-none w-8 h-8 border rounded-full border-gray-200 flex items-center justify-center">
-                                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-                                                    xmlns="http://www.w3.org/2000/svg">
-                                                    <path
-                                                        d="M4.30325 12.6667L1.33325 15V2.66667C1.33325 2.48986 1.40349 2.32029 1.52851 2.19526C1.65354 2.07024 1.82311 2 1.99992 2H13.9999C14.1767 2 14.3463 2.07024 14.4713 2.19526C14.5963 2.32029 14.6666 2.48986 14.6666 2.66667V12C14.6666 12.1768 14.5963 12.3464 14.4713 12.4714C14.3463 12.5964 14.1767 12.6667 13.9999 12.6667H4.30325ZM5.33325 6.66667V8H10.6666V6.66667H5.33325Z"
-                                                        fill="#4338CA" />
-                                                </svg>
-                                            </div>
-                                            <div class="pl-3">
-                                                <p tabindex="0" class="focus:outline-none text-sm leading-none"><span
-                                                        class="text-indigo-700">{{ $notifs->pesan }}</span></p>
-                                                <p tabindex="0" class="focus:outline-none text-xs leading-3 pt-1 text-gray-700">
-                                                    {{ $notifs->time_ago }}</p>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <form id="deleteNotifForm" action="{{ url('notif/' . $user->id) }}">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" tabindex="0" aria-label="delete icon" role="button"
-                                                    class="focus:outline-none w-6 h-6 flex items-center justify-center text-red-600 hover:text-red-800 hover:scale-105">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                        stroke="currentColor" class="w-5 h-5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-
-
-
-                        </div> --}}
-                    @endrole
-
-                </div>
+                    </div>
+                @endrole
                 @role('participant')
 
                     <div id="perlombaan" class="w-full">

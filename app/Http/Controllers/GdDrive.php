@@ -33,13 +33,13 @@ class GdDrive extends Controller
 
         $image = $request->file('name_project');
 
-        // Membuat nama file dengan format yang diinginkan
+        // === Membuat nama file dengan format yang diinginkan === //
         $imageName = $participants->namePeserta.'-'.$participants->race_name.'.'.$image->getClientOriginalExtension();
 
-        // Memindahkan file ke direktori yang diinginkan
+        // === Memindahkan file ke direktori yang diinginkan === //
         $image->move(public_path('upload'), $imageName);
 
-        // Simpan nama file dalam database
+        // === Simpan nama file dalam database === //
         $drive->name_project = $imageName;
 
         $drive->save();

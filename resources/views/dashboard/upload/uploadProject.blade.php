@@ -52,5 +52,4 @@
             </div>
         </div>
     </div>
-    <script></script>
 </x-panel.app>

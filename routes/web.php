@@ -1,11 +1,11 @@
 <?php
-
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactMeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DetailController;
 use App\Http\Controllers\DirectiveController;
+use App\Http\Controllers\export\ExportController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\GdDrive;
 use App\Http\Controllers\HomeController;
@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index']);
 
-// certificate user
+// === certificate user === //
 Route::get('certificate', [Certificate::class, 'certificate']);
 
 Route::get('/register', [RegisterController::class, 'index'])->name('register');
@@ -41,6 +41,9 @@ Route::middleware('guest')->group(function () {
 
 });
 
+
+
+// === akses route hanya user === //
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
@@ -60,7 +63,7 @@ Route::middleware('auth')->group(function () {
 
         });
 
-        // participant
+        // === participant === //
         Route::prefix('participant')->name('participant.')->group(function () {
             Route::get('race', [ParticipantRaceController::class, 'index'])->name('race.index');
             Route::post('race', [ParticipantRaceController::class, 'store'])->name('race.store');
@@ -70,10 +73,10 @@ Route::middleware('auth')->group(function () {
             Route::resource('invoice.team', TeamController::class)->only(['index', 'store']);
 
         });
-        // end participant
+        // === end participant === //
     });
 
-    // voucher route
+    // === voucher route === //
     Route::post('dashboard/voucher', [voucherController::class, 'store']);
     Route::post('payment/kode/{id}', [PaymentController::class, 'diskon'])->name('voucher.post');
 
@@ -100,10 +103,16 @@ Route::middleware('auth')->group(function () {
     Route::post('particpants/{id_peserta}', [ParticipantController::class, 'editParticipants']);
     Route::get('particpants/admin/delete/{id_peserta}', [ParticipantController::class, 'delete']);
 
-    // == route page peserta admin == //
+    // === route page peserta admin === //
     Route::get('/particpants/admin/{id}', [ParticipantController::class, 'peserta']);
+    Route::get('/particpants/admin/table/{id}', [ParticipantController::class, 'table'])->name('table.participants');
     Route::post('/utilities/upload', [UtilitiesController::class, 'upload']);
     Route::delete('/utilities/reverse', [UtilitiesController::class, 'reverse']);
+
+
+    // === route export data participants === //
+    Route::get('excel/{id}', [ExportController::class, 'excel'])->name('export.excel');
+    Route::get('pdf/{id}', [ExportController::class, 'pdf'])->name('export.pdf');
 });
 
 Route::get('/{slug}', [HomeController::class, 'show']);

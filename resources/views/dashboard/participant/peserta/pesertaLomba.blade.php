@@ -1,5 +1,13 @@
 <x-panel.app>
     <style>
+        .text-style-gradient-hover:hover {
+            background: linear-gradient(to right, #5f97ff, #7d7bfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            transition: all;
+        }
+
         /*Dialog Styles*/
         dialog {
             padding: 1rem 3rem;
@@ -113,9 +121,6 @@
             @endif
         });
     </script>
-
-
-
     {{-- modal message --}}
 
     @if (session()->has('message'))
@@ -151,26 +156,19 @@
             <!-- section header -->
             <header class="text-start mx-auto mb-12">
                 <h2 class="text-7xl text-center bebas-neue-regular mb-2 font-bold text-gray-800 ">
-                    Participants Perlombaan
+                    Participants Perlombaan <span>
+                        ( <a href="{{ route('table.participants', ['id' => $race->id]) }}"
+                            class="text-style-gradient-hover"> Table </a>)</span>
                 </h2>
                 <div class="text-center">
                     {{ $race->name }}
                 </div>
-                {{-- <form id="filterForm" class="mb-4 px-4">
-                        <select id="race" name="race" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option value="">All</option>
-                            @foreach ($race as $races)
-                            <option value="{{$races->id}}">{{$races->name}}</option>
-                            @endforeach
-                            <!-- Tambahkan opsi lain sesuai kebutuhan -->
-                        </select>
-                    </form> --}}
             </header>
             {{-- === data peserta perlombaan === --}}
 
             <div id="participantsContainer" class="flex flex-wrap flex-row -mx-4 justify-center">
                 @foreach ($getPesertaLomba as $data)
-                    <div class="flex-shrink max-w-full px-4 w-2/3 sm:w-1/2 md:w-5/12 lg:w-1/4 xl:px-6">
+                    <div class="flex-shrink max-w-full px-4 sm:w-1/2 md:w-5/12 lg:w-1/4 xl:px-6">
                         <div class="relative overflow-hidden bg-white dark:bg-gray-800 mb-12 hover-grayscale-0 wow fadeInUp rounded-2xl p-5"
                             data-wow-duration="1s"
                             style="visibility: visible; animation-duration: 1s; animation-name: fadeInUp;">

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use Yajra\DataTables\Facades\DataTables;
 
 class ParticipantController extends Controller
 {
@@ -51,9 +52,9 @@ class ParticipantController extends Controller
             ->where('participants.race_id', $id)
             ->select('participants.*', 'participants.id as id_peserta', 'participants.name as peserta', 'invoices.name as invoice_nama', 'users.*')
             ->get();
-        // $getPesertaLomba = Participant::where('race_id', $id)->get();
 
-        return view('dashboard.participant.peserta.pesertaLomba', compact('getPesertaLomba','race'));
+        // $getPesertaLomba = Participant::where('race_id', $id)->get();
+        return view('dashboard.participant.peserta.pesertaLomba', compact('getPesertaLomba', 'race'));
     }
 
     /**
@@ -142,5 +143,56 @@ class ParticipantController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function table (Request $request,$id) {
+        $race = Race::where('id', $id)->first();
+
+        if ($request->ajax()) {
+            $previousCommunity = null; // Pastikan ini berada di luar fungsi callback
+            $previousMaps = null; // Pastikan ini berada di luar fungsi callback
+
+            $query = Participant::with(['invoice.user'])
+                ->where('race_id', $id)
+                ->select('users.community', 'participants.name as peserta', 'users.address as maps', 'invoices.*')
+                ->join('invoices', 'participants.invoice_id', '=', 'invoices.id')
+                ->join('users', 'invoices.user_id', '=', 'users.id');
+
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->addColumn('community', function ($query) use (&$previousCommunity) {
+                    if ($query->community != $previousCommunity) {
+                        $previousCommunity = $query->community;
+                        return $query->community;
+                    }
+                    return '';
+                })
+                ->addColumn('maps', function ($query) use (&$previousMaps) {
+                    if ($query->maps != $previousMaps) {
+                        // Update previous community to ensure correct mapping
+                        $previousMaps = $query->maps;
+                        return $query->maps;
+                    }
+                    return '';
+                })
+                ->addColumn('peserta', function ($query) {
+                    return $query->peserta;
+                })
+                ->filterColumn('community', function($query, $keyword) {
+                    $query->where('users.community', 'like', "%{$keyword}%");
+                })
+                ->filterColumn('maps', function($query, $keyword) {
+                    $query->where('users.address', 'like', "%{$keyword}%");
+                })
+                ->filterColumn('peserta', function($query, $keyword) {
+                    $query->where('participants.name', 'like', "%{$keyword}%");
+                })
+                ->rawColumns(['community', 'maps', 'peserta'])
+                ->toJson();
+        }
+
+
+
+        return view('dashboard.participant.peserta.tablePeserta', compact('race'));
     }
 }
