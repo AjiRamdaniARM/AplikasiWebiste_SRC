@@ -7,10 +7,6 @@
 </head>
 
 <body class="bg-[#F2F5FA]">
-
-
-
-
     @include('sweetalert::alert')
     {{-- Page Wrapper --}}
     <div>

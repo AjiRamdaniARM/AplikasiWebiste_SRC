@@ -145,7 +145,8 @@ class ParticipantController extends Controller
         //
     }
 
-    public function table (Request $request,$id) {
+    public function table(Request $request, $id)
+    {
         $race = Race::where('id', $id)->first();
 
         if ($request->ajax()) {
@@ -163,35 +164,37 @@ class ParticipantController extends Controller
                 ->addColumn('community', function ($query) use (&$previousCommunity) {
                     if ($query->community != $previousCommunity) {
                         $previousCommunity = $query->community;
+
                         return $query->community;
                     }
+
                     return '';
                 })
                 ->addColumn('maps', function ($query) use (&$previousMaps) {
                     if ($query->maps != $previousMaps) {
                         // Update previous community to ensure correct mapping
                         $previousMaps = $query->maps;
+
                         return $query->maps;
                     }
+
                     return '';
                 })
                 ->addColumn('peserta', function ($query) {
                     return $query->peserta;
                 })
-                ->filterColumn('community', function($query, $keyword) {
+                ->filterColumn('community', function ($query, $keyword) {
                     $query->where('users.community', 'like', "%{$keyword}%");
                 })
-                ->filterColumn('maps', function($query, $keyword) {
+                ->filterColumn('maps', function ($query, $keyword) {
                     $query->where('users.address', 'like', "%{$keyword}%");
                 })
-                ->filterColumn('peserta', function($query, $keyword) {
+                ->filterColumn('peserta', function ($query, $keyword) {
                     $query->where('participants.name', 'like', "%{$keyword}%");
                 })
                 ->rawColumns(['community', 'maps', 'peserta'])
                 ->toJson();
         }
-
-
 
         return view('dashboard.participant.peserta.tablePeserta', compact('race'));
     }

@@ -15,15 +15,9 @@ use Yajra\DataTables\Facades\DataTables;
 
 class InvoiceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request)
     {
         $invoices = Invoice::with('user')->orderBy('created_at', 'desc');
-
         if ($request->ajax()) {
             return DataTables::eloquent($invoices)
                 ->addIndexColumn()
@@ -74,11 +68,6 @@ class InvoiceController extends Controller
         return view('dashboard.invoice.index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         $users = User::select('id', 'name')->get();
@@ -87,11 +76,6 @@ class InvoiceController extends Controller
         return view('dashboard.invoice.create', compact('users', 'races'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -124,12 +108,6 @@ class InvoiceController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         $inv = Invoice::findOrFail($id);
@@ -137,23 +115,11 @@ class InvoiceController extends Controller
         return view('dashboard.invoice.show', compact('inv'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -192,12 +158,6 @@ class InvoiceController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         //
@@ -213,7 +173,7 @@ class InvoiceController extends Controller
             ->join('invoices', 'invoice_races.invoice_id', '=', 'invoices.id')
             ->join('races', 'invoice_races.race_id', '=', 'races.id')
             ->where('invoice_races.invoice_id', $id)
-            ->select('invoices.*', 'invoice_races.*', 'races.name as race_name', 'races.id as race_id', 'invoices.id as invoice_id', 'races.max_people')
+            ->select('invoices.*', 'invoice_races.*', 'races.name as race_name', 'races.id as race_id', 'invoices.id as invoice_id', 'races.max_people', 'invoices.name as invoice_name')
             ->first();
 
         $hasParticipants = $data->isNotEmpty();

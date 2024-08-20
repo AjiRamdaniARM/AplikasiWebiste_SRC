@@ -9,11 +9,6 @@ use Yajra\DataTables\Facades\DataTables;
 
 class LocationEventController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request)
     {
         $locations = LocationEvent::with('user');
@@ -41,11 +36,6 @@ class LocationEventController extends Controller
         return view('dashboard.location-event.index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         //

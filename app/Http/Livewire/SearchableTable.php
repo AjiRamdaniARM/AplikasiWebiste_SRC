@@ -8,6 +8,7 @@ use Livewire\Component;
 class SearchableTable extends Component
 {
     public $search = ''; // Pastikan ada nilai default
+
     public $race_id;
 
     protected $queryString = ['search'];
@@ -21,7 +22,7 @@ class SearchableTable extends Component
             ->select('users.community', 'participants.name as peserta', 'users.address as maps');
 
         if ($this->search) {
-            $query->where('participants.name', 'like', '%' . $this->search . '%');
+            $query->where('participants.name', 'like', '%'.$this->search.'%');
         }
 
         $data = $query->paginate(10);

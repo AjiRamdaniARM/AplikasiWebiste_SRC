@@ -8,17 +8,14 @@ use App\Models\Participant;
 use App\Models\Race;
 use App\Models\User;
 use App\Models\Vourcher;
+use Haruncpi\LaravelIdGenerator\IdGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Midtrans\Config;
 
 class DashboardController extends Controller
 {
-    /**
-     * Handle the incoming requ est.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function __invoke(Request $request)
     {
         $lv2 = User::with('roles')->role('participant')->count();
@@ -29,7 +26,7 @@ class DashboardController extends Controller
             ->join('races', 'participants.race_id', '=', 'races.id')
             ->join('project_onlines', 'participants.id_upload', '=', 'project_onlines.id')
             ->where('races.category_id', 11)
-            ->select('participants.*', 'participants.id as id_peserta', 'races.category_id', 'project_onlines.*', 'project_onlines.id as online_id')
+            ->select('participants.*', 'participants.id as id_peserta', 'races.category_id', 'races.id as race_id', 'project_onlines.*', 'project_onlines.id as online_id')
             ->get();
 
         $data = Race::all();
@@ -44,49 +41,104 @@ class DashboardController extends Controller
         $item = Invoice::where('user_id', $user->id)->count();
         $itemAll = Invoice::all()->count();
         $races = Race::all()->count();
-        $notif = Notif::where('id_user', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
+        $getRaceOnline = Race::where('category_id', 11)->get();
+        $notif = Notif::where('id_user', $user->id)->first();
+        $getParticipantSeleksi2 = Participant::where('id_user', $user->id)->first();
+        $message = null;
+        if (is_null($notif)) {
+            $message = 'Data not found';
+        }
         $voucher = Vourcher::orderBy('created_at', 'desc')->get();
-        // idgenerated
         $kodeVoucher = substr(bin2hex(random_bytes(5)), 0, 16);
-        // Combine prefix, random string, and timestamp
         $idVoucher = 'sukarobot_'.$kodeVoucher;
 
-        return view('dashboard.index', compact('voucher', 'lv2', 'itemAll', 'pesertaOnline', 'participants', 'data', 'data2', 'races', 'item', 'notif', 'user', 'idVoucher', 'participantsUser', 'dataUser'));
+        return view('dashboard.index', compact('voucher', 'lv2', 'itemAll', 'pesertaOnline', 'participants', 'data', 'data2', 'races', 'item', 'notif', 'user', 'idVoucher', 'participantsUser', 'dataUser', 'getRaceOnline', 'getParticipantSeleksi2'));
     }
 
     public function seleksi(Request $request, $id_peserta)
     {
-        $notif = new Notif;
-        // input seleksi ke database
+        // === Input seleksi ke database === //
+        $pesertaOnline = DB::table('participants')
+            ->join('races', 'participants.race_id', '=', 'races.id')
+            ->where('participants.id', $id_peserta)
+            ->select('participants.*', 'participants.id as id_peserta', 'races.category_id', 'races.name as nama_lomba', 'races.id as id_race')
+            ->first();
+
         $seleksi = Participant::findOrFail($id_peserta);
+        $race = Race::where('category_id', 11)->first(); // Mengambil objek race
         $get = Participant::where('id', $id_peserta)->first();
         $seleksi->id_seleksi = $request->input('seleksi');
+        $notif = Notif::where('id_user', $request->input('id_user'))->where('id_peserta', $id_peserta)->first();
+
+        if (is_null($notif)) {
+            $notif = new Notif;
+            $notif->id_user = $request->input('id_user');
+            $notif->id_peserta = $id_peserta;
+        }
 
         if ($request->input('seleksi') == 2) {
             $judul = 'belum lulus';
-            $message = 'participant '.$get->name.' dinyatakan tidak lulus';
+            $message = 'Participant '.$get->name.' dinyatakan tidak lulus';
+            $notif->status = 'tidak ada';
         } else {
-            $judul = 'lulus';
-            $message = 'participant '.$get->name.' dinyatakan lulus'; // Atau pesan default lainnya
+            if (empty($race->idr_seleksi)) {
+                $judul = 'lulus';
+                $message = 'Participant '.$get->name.' dinyatakan lulus';
+                $notif->status = 'ada';
+            } else {
+                $idGenerate = IdGenerator::generate(['table' => 'invoices', 'field' => 'name', 'length' => 10, 'prefix' => 'INV-']);
+                $jumlahPrice = $race->idr_seleksi;
+
+                DB::beginTransaction();
+                try {
+                    $invoice = Invoice::create([
+                        'user_id' => $request->id_user,
+                        'name' => $idGenerate,
+                        'jumlah' => 1,
+                    ]);
+
+                    $invoice->itemRace()->attach($pesertaOnline->id_race); // Menggunakan ID race yang sesuai
+                    DB::commit();
+                    $user = User::where('id', $request->id_user)->first();
+
+                    // Set konfigurasi Midtrans
+                    Config::$serverKey = config('midtrans.serverKey');
+                    Config::$isProduction = config('midtrans.isProduction');
+                    Config::$isSanitized = config('midtrans.isSanitized');
+                    Config::$is3ds = config('midtrans.is3ds');
+
+                    $params = [
+                        'transaction_details' => [
+                            'order_id' => rand(),
+                            'gross_amount' => $jumlahPrice,
+                        ],
+                        'customer_details' => [
+                            'first_name' => $user->name,
+                            'email' => $user->email,
+                        ],
+                    ];
+
+                    $snapToken = \Midtrans\Snap::getSnapToken($params);
+                    $invoice->snap_token = $snapToken;
+                    $invoice->id_seleksi = $request->seleksi;
+                    $invoice->save();
+
+                    $get->invoice_seleksi_2 = $idGenerate;
+                    $get->save();
+
+                    $message = 'Participant '.$get->name.' dinyatakan lulus dan invoice berhasil dibuat.';
+                } catch (\Exception $e) {
+                    DB::rollBack();
+
+                    return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat memproses invoice.']);
+                }
+            }
         }
-        $notif->id_user = $request->input('id_user');
-        $notif->judul_notif = $judul;
-        $notif->pesan = $message;
+
         $notif->save();
         $seleksi->save();
 
         return redirect()->back()->with('seleksi', $message);
-    }
-
-    public function notifDelete($id)
-    {
-        $notif = Notif::where('id_user', $id)->first();
-        $notif->delete();
-
-        return redirect()->back();
     }
 
     public function uploadProject()
@@ -99,5 +151,14 @@ class DashboardController extends Controller
             ->get();
 
         return view('dashboard.upload.uploadProject', compact('pesertaOnline'));
+    }
+
+    public function paySeleksi(Request $request)
+    {
+        $put = Race::where('id', $request->race_id)->firstOrFail();
+        $put->idr_seleksi = $request->pay_idr;
+        $put->save();
+
+        return back();
     }
 }

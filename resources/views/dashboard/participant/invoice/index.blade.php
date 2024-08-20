@@ -237,12 +237,15 @@
                             </div>
                             <button onclick="window.dialog.close();" aria-label="close" class="x">❌</button>
                         </dialog>
-
                         <li class="py-3 sm:py-4">
                             <div class="flex items-center space-x-4">
                                 <div class="flex-1 min-w-0">
                                     <h1 class="text-lg font-bold text-gray-900 truncate dark:text-white py-2">
-                                        {{ $invoice->name }}
+                                        @if ($invoice->id_seleksi == 1)
+                                            {{ $invoice->name }} <span class="text-blue-500">SELEKSI 2</span>
+                                        @else
+                                            {{ $invoice->name }}
+                                        @endif
                                     </h1>
                                     <div class="text-sm text-gray-500 truncate  dark:text-gray-400 py-2">
                                         @if ($invoice->status == 'unpaid')
@@ -254,8 +257,6 @@
                                             <span class="text-white p-1 bg-gray-600 px-4 rounded-full">Status Tidak
                                                 Diketahui</span>
                                         @endif
-
-
                                     </div>
                                 </div>
                                 <div
@@ -268,7 +269,12 @@
                                     } else {
                                         $data = $invoice->price * $invoice->jumlah;
                                     }
-                                    echo number_format($data, 2, ',', '.');
+
+                                    if ($invoice->id_seleksi == 1) {
+                                        echo number_format($invoice->idr_seleksi, 2, ',', '.');
+                                    } else {
+                                        echo number_format($data, 2, ',', '.');
+                                    }
                                     ?>
 
                                 </div>
@@ -287,17 +293,57 @@
                                     </form>
                                     @if ($invoice->status == 'unpaid')
                                         @if ($data == 0)
-                                            <form id="payment-form"
-                                                action="{{ route('participant.invoice.store', ['id' => $invoice->invoice_id]) }}"
-                                                method="post">
-                                                @csrf
-                                                <input type="hidden" name="transaction_result" id="transaction-result">
-                                                <input type="text" name="status" hidden value="paid">
-                                                <button type="submit"
+                                            @if ($invoice->id_seleksi > 0)
+                                                <button id="pay-buttonOnline{{ $invoice->invoices_name }}"
+                                                    data-product-name="{{ $invoice->name }}"
                                                     class="text-black font-bold px-3 py-1 rounded-xl bg-green-300">
-                                                    Free Pendaftaran
+                                                    Bayar Sekarang
                                                 </button>
-                                            </form>
+                                                <form id="payment-form-online"
+                                                    action="{{ route('seleksi.invoice.store', ['id' => $invoice->invoice_id]) }}"
+                                                    method="post">
+                                                    @csrf
+                                                    <input type="hidden" name="transaction_result"
+                                                        id="transaction-result">
+                                                    <input type="text" name="status" hidden value="paid">
+                                                    <!--<button type="submit" >d</button>-->
+                                                </form>
+                                                <script type="text/javascript">
+                                                    document.getElementById('pay-buttonOnline{{ $invoice->invoices_name }}').onclick = function() {
+                                                        // SnapToken acquired from previous step
+                                                        snap.pay('{{ $invoice->snap_token }}', {
+                                                            // Optional
+                                                            onSuccess: function(result) {
+                                                                document.getElementById('transaction-result').value = JSON.stringify(result);
+                                                                document.getElementById('payment-form-online').submit();
+                                                            },
+                                                            // Optional
+                                                            onPending: function(result) {
+                                                                /* You may add your own js here, this is just example */
+                                                                document.getElementById('result-json').innerHTML += JSON.stringify(result, null, 2);
+                                                            },
+                                                            // Optional
+                                                            onError: function(result) {
+                                                                /* You may add your own js here, this is just example */
+                                                                document.getElementById('result-json').innerHTML += JSON.stringify(result, null, 2);
+                                                            }
+                                                        });
+                                                    };
+                                                </script>
+                                            @else
+                                                <form id="payment-form"
+                                                    action="{{ route('participant.invoice.store', ['id' => $invoice->invoice_id]) }}"
+                                                    method="post">
+                                                    @csrf
+                                                    <input type="hidden" name="transaction_result"
+                                                        id="transaction-result">
+                                                    <input type="text" name="status" hidden value="paid">
+                                                    <button type="submit"
+                                                        class="text-black font-bold px-3 py-1 rounded-xl bg-green-300">
+                                                        Free Pendaftaran
+                                                    </button>
+                                                </form>
+                                            @endif
                                         @else
                                             <button id="pay-button{{ $invoice->invoices_name }}"
                                                 data-product-name="{{ $invoice->name }}"
@@ -306,13 +352,20 @@
                                             </button>
                                         @endif
                                     @elseif ($invoice->status == 'paid')
-                                        <a href="{{ route('particpants.show', ['id' => $invoice->invoice_id]) }}">
-                                            <button class="text-black font-bold px-3 py-1 rounded-xl bg-green-300">
-                                                Participants
-                                            </button></a>
+                                        @if ($invoice->id_seleksi > 0)
+                                            <a href="{{ route('dashboard') }}">
+                                                <button class="text-black font-bold px-3 py-1 rounded-xl bg-green-300">
+                                                    Cek Dashboard
+                                                </button></a>
+                                        @else
+                                            <a href="{{ route('particpants.show', ['id' => $invoice->invoice_id]) }}">
+                                                <button class="text-black font-bold px-3 py-1 rounded-xl bg-green-300">
+                                                    Participants
+                                                </button></a>
+                                        @endif
                                     @endif
                                 </div>
-                                <script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}">
+                                <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}">
                                 </script>
                                 <script type="text/javascript">
                                     document.getElementById('pay-button{{ $invoice->invoices_name }}').onclick = function() {
@@ -344,34 +397,5 @@
             </div>
         </div>
     </div>
-    {{-- <body class="antialiased font-sans bg-gray-200">
-    <div class="container mx-auto px-4 sm:px-4">
-        <div class="py-8">
-            <div class="grup-tools">
-                <h1 class="poppins-bold text-4xl text-[#34364A]">Invoice Manage</h1>
-                <p class="rela">data pembayaran perlombaan anda</p>
-            </div>
-            <div class="-mx-4 sm:-mx-8  py-4 overflow-x-auto">
-                <div class="inline-block min-w-full shadow rounded-lg overflow-hidden">
-                    <table class="table datatables" id="dataTable">
-                        <thead class="bg-blue-500 text-white">
-                            <tr>
-                                <th class="text-capitalize">No</th>
-                                <th class="text-capitalize">Name</th>
-                                <th class="text-capitalize">Status</th>
-                                <th class="text-capitalize">Race</th>
-                                <th class="text-capitalize">Total</th>
-                                <th class="text-capitalize">Created At</th>
-                                <th class="text-capitalize">Action</th>
-                            </tr>
-                        </thead>
-                    </table>
-
-                </div>
-            </div>
-        </div>
-    </div>
-</body> --}}
-
 
 </x-panel.app>

@@ -16,6 +16,8 @@ class Participant extends Model
         'kelas',
         'IdCard',
         'id_user',
+        'id_upload',
+        'invoice_seleksi_2',
     ];
 
     public function invoice()

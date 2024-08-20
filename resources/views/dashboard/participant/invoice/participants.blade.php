@@ -229,7 +229,7 @@
                                                     onclick="alert('Mohon Menunggu Tahap Selanjunya')">Sudah
                                                     Upload</button>
                                             @else
-                                            <button type="button"
+                                                <button type="button"
                                                     class="bg-yellow-500 hover:bg-yellow-300 hover:scale-105 transition-all text-black rounded-sm"
                                                     onclick="alert('dalam prosses perbaikan')">Upload
                                                     Projects</button>
@@ -240,13 +240,13 @@
                                                 <!--    Projects</button>-->
                                             @endif
                                         @endif
-                                        
-                                        @if($datas->name == 'Aji Ramdani' )
-                                          <button type="button"
-                                                  class="bg-yellow-500 hover:bg-yellow-300 hover:scale-105 transition-all text-black rounded-sm"
-                                                  data-modal-target="authentication-modal-rules{{ $datas->id }}"
-                                                  data-modal-toggle="authentication-modal-rules{{ $datas->id }}">Upload
-                                                 Projects</button>
+
+                                        @if ($datas->name == 'Aji Ramdani')
+                                            <button type="button"
+                                                class="bg-yellow-500 hover:bg-yellow-300 hover:scale-105 transition-all text-black rounded-sm"
+                                                data-modal-target="authentication-modal-rules{{ $datas->id }}"
+                                                data-modal-toggle="authentication-modal-rules{{ $datas->id }}">Upload
+                                                Projects</button>
                                         @endif
 
 

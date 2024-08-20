@@ -24,5 +24,7 @@
 <script src="{{ asset('js/sistem.js') }}"></script>
 <link rel="stylesheet" href="{{ asset('css/animasi.css') }}">
 <link rel="stylesheet" href="{{ 'css/globalFont.css' }}">
-
+<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
 @stack('extra-css')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -25,7 +25,8 @@ class InvoiceController extends Controller
                 'invoices.name as invoices_name',
                 'races.id as races_id',
                 'invoices.id as invoice_id',
-                'categories.name as category_name'
+                'categories.name as category_name',
+
             )
             ->orderBy('invoices.created_at', 'desc')
             ->get();

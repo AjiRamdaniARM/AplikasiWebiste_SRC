@@ -17,6 +17,7 @@ class Invoice extends Model
         'diskon',
         'status',
         'snap_token',
+        'id_seleksi',
 
     ];
 

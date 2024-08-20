@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactMeController;
@@ -40,8 +41,6 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'authenticate']);
 
 });
-
-
 
 // === akses route hanya user === //
 Route::middleware('auth')->group(function () {
@@ -86,12 +85,19 @@ Route::middleware('auth')->group(function () {
     Route::get('notif/{id}', [DashboardController::class, 'notifDelete']);
     Route::post('/dashboard/seleksi/{id_peserta}', [DashboardController::class, 'seleksi']);
     Route::get('/dashboard/upload', [DashboardController::class, 'uploadProject'])->name('upload.index');
+    Route::post('/dashboard/paySeleksi', [DashboardController::class, 'paySeleksi'])->name('paySeleksi.post');
 
     Route::get('participant/admin', [PesertaController::class, 'adminParticipants'])->name('participant.show.admin');
     Route::get('participants', [ParticipantController::class, 'show'])->name('participant.show.index');
+    // === jadwal route == //
     Route::get('jadwal', [JadwalController::class, 'index'])->name('jadwal.index');
+    Route::post('jadwal/team/prosses', [JadwalController::class, 'postTeam'])->name('team.index');
+    Route::delete('jadwal/team/delete/{id}', [JadwalController::class, 'destroy'])->name('team.delete');
+
+     // === jadwal route == //
     Route::get('particpants/{id}', [InvoiceController::class, 'participants'])->name('particpants.show');
     Route::post('/dashboard/participant/invoice/{id}', [PaymentController::class, 'pay2'])->name('participant.invoice.store');
+    Route::post('/dashboard/participant/seleksi/{id}', [PaymentController::class, 'PaySeleksi2'])->name('seleksi.invoice.store');
     Route::get('detail/{id}', [DetailController::class, 'index']);
     Route::post('detail/{id}', [DetailController::class, 'create']);
     Route::post('detail/online/{id}', [DetailController::class, 'createOnline']);
@@ -108,7 +114,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/particpants/admin/table/{id}', [ParticipantController::class, 'table'])->name('table.participants');
     Route::post('/utilities/upload', [UtilitiesController::class, 'upload']);
     Route::delete('/utilities/reverse', [UtilitiesController::class, 'reverse']);
-
 
     // === route export data participants === //
     Route::get('excel/{id}', [ExportController::class, 'excel'])->name('export.excel');
