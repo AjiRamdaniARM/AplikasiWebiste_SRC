@@ -1,4 +1,26 @@
 <x-panel.app>
+    <div id="loading" style="display: none;" class='flex space-x-2 justify-center items-center bg-white  h-screen '>
+        <span class='sr-only'>Loading...</span>
+        <div class='h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.3s]'></div>
+        <div class='h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.15s]'></div>
+        <div class='h-8 w-8 bg-black rounded-full animate-bounce'></div>
+    </div>
+    <style>
+        #loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.455);
+            color: #fff;
+            font-size: 1.5em;
+            z-index: 9999;
+        }
+    </style>
     <div class=" py-5">
         <h1 class="text-center text-style-gradient inter font-bold bebas-neue-regular text-7xl lg:text-8xl ">
             WELCOME TO
@@ -116,6 +138,7 @@
             </div>
         @endrole
         @role('participant')
+
             <div class="grup flex flex-col gap-4">
                 <div class="bg-white p-6 border-2 border-black rounded-lg shadow-sm">
                     <div class="flex items-baseline">
@@ -203,7 +226,9 @@
 
             {{-- === buat kondisi ===  --}}
             @if (is_null($notif))
-                <h1>tidak ada data</h1>
+                <script>
+                    console.log('tidak ada data notifikasi');
+                </script>
             @else
                 @if ($notif->status == 'ada')
                     <img src="{{ asset('assets/seleksi_lulius_1.png') }}" class="w-full rounded-lg" alt="">
@@ -211,59 +236,106 @@
                 @endif
             @endif
         </div>
-        @if ($getParticipantSeleksi2 && $getParticipantSeleksi2->invoice_seleksi_2 == null)
-            <h1>halo</h1>
-        @elseif ($getParticipantSeleksi2)
-            <div class="container-content-body-upload py-10">
-                <div class="upload bg-blue-500 w-full flex flex-col justify-center items-center p-10 rounded-lg">
-                    <div class="head text-white poppins-bold">
-                        <h2 class="uppercase text-3xl" id="deks">Upload File Project Seleksi 2</h2>
-                        <div id="upload-message-text">untuk perlombaan online</div>
-                    </div>
-                    <div class="body-content-upload py-3">
-                        <form action="" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <input type="file" id="upload-message" name="file" hidden />
+        @if ($getDataSeleksiPay && $getDataSeleksiPay->status == 'paid')
+            <h2 class="text-center text-style-gradient inter font-bold bebas-neue-regular text-7xl lg:text-8xl ">
+                UPLOADED SELEKSI 2</h2>
+            <form id="seleksi2" enctype="multipart/form-data">
+                @csrf
+                <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-8 w-full  py-2  ">
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded mt-4 ">
+                            <div class="border-t">
+                                <div class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-10 p-10 pb-8">
+                                    <div class="lg:col-span-2">
+                                        <label class="text-xs font-semibold" for="cardNumber">Ketentuan Upload</label>
+                                        <div class="flex items-center h-full border mt-1 rounded px-4 w-full text-sm"
+                                            id="textUpload">Upload file project menggunakan file zip untuk web dan pdf / png
+                                            / jpeg untuk design
+                                        </div>
+                                    </div>
+                                    <div class="">
+                                        <label class="text-xs font-semibold" for="cardNumber">Upload File</label>
+                                        <input class="flex items-center h-10 border mt-1 rounded w-full text-sm"
+                                            type="file" name="file" id="file" required>
+                                    </div>
+                                    <div class="">
+                                        <label class="text-xs font-semibold" for="cardNumber">Nama Team / Individu -
+                                            project</label>
+                                        <input class="flex items-center h-10 border mt-1 rounded px-4 w-full text-sm"
+                                            type="text" name="name" id="file"
+                                            placeholder="Cth:Subot - Web or Design" required>
+                                    </div>
+                                </div>
 
-                            <div class="grup flex flex-wrap gap-2">
-                                <button type="button" id="dropzone-fil"
-                                    class="text-blue-500 bg-white px-5 py-2 rounded-lg hover:scale-105 focus:scale-105 transition-all hover:shadow-md focus:shadow-md hover:font-bold focus:font-bold">
-                                    Pilih File
-                                </button>
-                                <button type="button" onclick="window.dialogOnlineUpload.show();"
-                                    class="text-blue-500 bg-white px-5 py-2 rounded-lg hover:scale-105 focus:scale-105 transition-all hover:shadow-md focus:shadow-md hover:font-bold focus:font-bold">
-                                    Kirim File
-                                </button>
                             </div>
-                        </form>
-                        <script>
-                            document.getElementById('dropzone-fil').addEventListener('click', function() {
-                                document.getElementById('upload-message').click();
-                            });
-
-                            document.getElementById('upload-message').addEventListener('change', function(event) {
-                                const uploadMessageText = document.getElementById('upload-message-text');
-                                const deks = document.getElementById('deks');
-
-                                if (event.target.files.length > 0) {
-                                    uploadMessageText.innerText = 'Anda sudah mengunggah file';
-                                    deks.style.color = 'yellow';
-                                    deks.innerText = 'Silahkan untuk tap button KIRIM FILE';
-                                } else {
-                                    uploadMessageText.innerText = 'Upload File Perlombaan';
-                                    deks.innerText = 'Dimohon untuk upload karya atau project kamu untuk melanjutkan perlombaan';
-                                }
-                            });
-                        </script>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="bg-white rounded mt-4 py-6">
+                            <div class="px-8 mt-4">
+                            </div>
+                            <div class="px-8 mt-4 border-t pt-3">
+                                <div class="flex items-end justify-between">
+                                    <span class="font-semibold">Total </span>
+                                    <span id="uploadCount" class="font-semibold text-green-500">+0</span>
+                                </div>
+                                <span class="text-xs text-gray-500 mt-2">File Uploaded</span>
+                            </div>
+                            <div class="flex flex-col px-8 pt-4">
+                                <button type="submit"
+                                    class="flex items-center justify-center bg-blue-600 text-sm font-medium w-full h-10 rounded text-blue-50 hover:bg-blue-700">Kirim
+                                    File</button>
+                                <a class="text-xs text-blue-500 mt-3 underline">Punya Kendala ?</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </form>
+            <script>
+                $(document).ready(function() {
+                    loadUploadCount();
+
+                    $('#seleksi2').on('submit', function(e) {
+                        e.preventDefault();
+                        let formData = new FormData(this);
+                        $('#loading').show(); // Tampilkan loading
+                        $.ajax({
+                            url: "{{ route('upload.seleksi2') }}",
+                            method: "POST",
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                $('#textUpload').text('anda sudah upload file pertama');
+                                loadUploadCount();
+                                $('#loading').hide(); // Sembunyikan loading setelah selesai
+                            },
+                            error: function(response) {
+                                console.log(response);
+                                $('#loading').hide(); // Sembunyikan loading meskipun gagal
+                            }
+                        });
+                    });
+
+                    function loadUploadCount() {
+                        $.ajax({
+                            url: "{{ route('dashboard') }}",
+                            method: "GET",
+                            success: function(response) {
+                                $('#uploadCount').text(response.total);
+                            }
+                        });
+                    }
+                });
+            </script>
+        @elseif (is_null($getDataSeleksiPay))
+            <script>
+                console.log('tidak ada data');
+            </script>
         @endif
-
-
     @endrole
     @role('participant')
-
+        <br>
         <div id="perlombaan" class="w-full">
             <div id="competition" class="perlombaan">
                 <div class="label font-bold inter mb-3 leading-[36px] text-black lg:text-[24px] text-[20px] ">
@@ -331,13 +403,90 @@
         </div>
     @endrole
     @role('admin')
-
+        {{-- === table seleksi 2 === --}}
         <div class="flex h-full flex-col justify-center">
             <!-- Table -->
             <div class="mx-auto w-full  border-2 border-black rounded-sm bg-white shadow-md">
                 <div class="overflow-x-auto p-3">
                     <header class="border-b border-gray-100  py-4 flex justify-between items-center">
-                        <div class="font-semibold text-gray-800">Manage Perlombaan Online</div>
+                        <div class="font-semibold text-gray-800">Manage Perlombaan Online Seleksi 2</div>
+                    </header>
+                    <table class="w-full table-auto">
+                        <thead class="bg-yellow-500 text-xs font-semibold uppercase text-black">
+                            <tr>
+                                <th class="p-2">No</th>
+                                <th class="p-2">
+                                    <div class="text-left font-semibold">File Name</div>
+                                </th>
+
+                                <th class="p-2">
+                                    <div class="text-left font-semibold">Seleksi</div>
+                                </th>
+                                <th class="p-2">
+                                    <div class="text-left font-semibold">Status</div>
+                                </th>
+                                <th class="p-2">
+                                    <div class="text-center font-semibold">Action</div>
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="divide-y divide-gray-100 text-sm">
+                            <!-- record 1 -->
+                            @foreach ($getSeleksiUpload as $online)
+                                <tr>
+                                    <td class="p-2">
+                                        {{ $loop->iteration }}
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="font-medium text-gray-800">{{ $online->name_project }}
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="font-medium text-gray-800">{{ $online->seleksi }}
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        @if ($online->status == 'sudah upload')
+                                            <div class="text-left font-medium text-green-500">
+                                                {{ $online->status }}</div>
+                                        @elseif ($online->id_seleksi == 'belum upload')
+                                            <div class="text-left font-medium text-red-500">
+                                                {{ $online->status }}</div>
+                                        @endif
+                                    </td>
+                                    <td class="p-2 flex justify-center gap-2">
+                                        <button onclick="downloadFile('{{ $online->name_project }}')">
+                                            <div class="download text-left font-medium text-blue-500 ">Download</div>
+                                        </button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- total amount -->
+                <div class="flex justify-end space-x-4 border-t border-gray-100 px-5 py-4 text-1xl font-bold">
+                    <div>Data Participants Online</div>
+                </div>
+
+                <div class="flex justify-end">
+                    <!-- send this data to backend (note: use class 'hidden' to hide this input) -->
+                    <input type="hidden" class="border border-black bg-gray-50" x-model="selected" />
+                </div>
+            </div>
+
+
+        </div>
+        <br>
+        {{-- === table seleksi 1 === --}}
+        <div class="flex h-full flex-col justify-center">
+            <!-- Table -->
+            <div class="mx-auto w-full  border-2 border-black rounded-sm bg-white shadow-md">
+                <div class="overflow-x-auto p-3">
+                    <header class="border-b border-gray-100  py-4 flex justify-between items-center">
+                        <div class="font-semibold text-gray-800">Manage Perlombaan Online seleksi 1</div>
                         <div class="grup-container-button flex gap-2">
                             <button onclick="window.dialogOnline.showModal();"
                                 class="font-semibold text-white px-3 py-1  rounded-sm hover:scale-105 hover:bg-blue-800 bg-blue-500 text-[10px] lg:text-[15px] ">
@@ -363,6 +512,9 @@
                                 </th>
                                 <th class="p-2">
                                     <div class="text-left font-semibold">Status</div>
+                                </th>
+                                <th class="p-2">
+                                    <div class="text-left font-semibold">Seleksi</div>
                                 </th>
                                 <th class="p-2">
                                     <div class="text-center font-semibold">Action</div>
@@ -402,6 +554,10 @@
                                                 {{ $pesertaOnlines->status }}</div>
                                         @endif
                                     </td>
+                                    <td class="p-2">
+                                        <div class="font-medium text-gray-800">{{ $pesertaOnlines->seleksi }}
+                                        </div>
+                                    </td>
                                     <td class="p-2 flex justify-center gap-2">
                                         <form id="seleksi-form-lolos{{ $pesertaOnlines->id }}"
                                             action="{{ url('/dashboard/seleksi/' . $pesertaOnlines->id_peserta) }}"
@@ -412,7 +568,7 @@
                                                 <input type="text" name="races"
                                                     value="{{ $pesertaOnlines->race_id }}" hidden>
                                                 <input type="text" name="id_user"
-                                                    value="{{ $pesertaOnlines->id_user }}" hidden>
+                                                    value="{{ $pesertaOnlines->userID }}" hidden>
                                                 <button type="submit"
                                                     class="bg-green-500 hover:scale-105 text-white px-2">Lolos</button>
                                             </div>
@@ -426,7 +582,7 @@
                                                 <input type="text" name="races"
                                                     value="{{ $pesertaOnlines->race_id }}" hidden>
                                                 <input type="text" name="id_user"
-                                                    value="{{ $pesertaOnlines->id_user }}" hidden>
+                                                    value="{{ $pesertaOnlines->userID }}" hidden>
                                                 <button type="submit"
                                                     class="bg-red-500 hover:scale-105 text-white px-2 ">Tidak
                                                     Lolos</button>
@@ -449,6 +605,8 @@
                     <input type="hidden" class="border border-black bg-gray-50" x-model="selected" />
                 </div>
             </div>
+
+
         </div>
 
         <main>
@@ -456,6 +614,8 @@
         </main>
     @endrole
     </div>
+
+
     {{-- === modal pay seleksi 2 === --}}
     <dialog id="dialogOnline">
         <form method="POST" action="{{ route('paySeleksi.post') }}">

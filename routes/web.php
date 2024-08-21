@@ -85,6 +85,7 @@ Route::middleware('auth')->group(function () {
     Route::get('notif/{id}', [DashboardController::class, 'notifDelete']);
     Route::post('/dashboard/seleksi/{id_peserta}', [DashboardController::class, 'seleksi']);
     Route::get('/dashboard/upload', [DashboardController::class, 'uploadProject'])->name('upload.index');
+    Route::post('/dashboard/upload/seleksi2', [GdDrive::class, 'upload2'])->name('upload.seleksi2');
     Route::post('/dashboard/paySeleksi', [DashboardController::class, 'paySeleksi'])->name('paySeleksi.post');
 
     Route::get('participant/admin', [PesertaController::class, 'adminParticipants'])->name('participant.show.admin');

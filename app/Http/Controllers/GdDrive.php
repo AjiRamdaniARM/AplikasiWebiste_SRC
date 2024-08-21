@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Participant;
 use App\Models\ProjectOnlines;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 
 class GdDrive extends Controller
@@ -24,7 +25,6 @@ class GdDrive extends Controller
             ->join('races', 'participants.race_id', '=', 'races.id')
             ->select('participants.*', 'races.name as race_name', 'races.id as race_id', 'participants.name as namePeserta')
             ->first();
-
         if (! $participants) {
             return redirect()->back()->with('error', 'Participant not found.');
         }
@@ -46,6 +46,32 @@ class GdDrive extends Controller
         $up->save();
 
         return redirect('particpants/'.$participants->invoice_id)->with('success', 'File uploaded successfully.');
+    }
+    public function upload2(Request $request)
+    {
+
+        if (! $request->file('file')) {
+            return redirect()->back()->with('error', 'Drive not found.');
+        }
+        $drive =  new ProjectOnlines();
+        $drive->status = 'sudah upload';
+        $image = $request->file('file');
+        $fileProject = $request->input('name');
+
+        $timestamp = now()->format('Ymd_His');
+        // === Membuat nama file dengan format yang diinginkan === //
+        $imageName = $fileProject.'_'.$timestamp.'.'.$image->getClientOriginalExtension();
+
+        // === Memindahkan file ke direktori yang diinginkan === //
+        $image->move(public_path('upload'), $imageName);
+
+        // === Simpan nama file dalam database === //
+        $drive->name_project = $imageName;
+        $drive->seleksi = 2;
+        $drive->id_user = Auth::user()->id;
+        $drive->save();
+
+        return response()->json($drive);
     }
 
     public function Upload($id)

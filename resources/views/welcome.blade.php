@@ -397,11 +397,18 @@
                 </div>
             </div>
         </div>
-
-
-
     </div>
-
+    <div class="content-respasi-hotel py-3">
+        <div class="body flex flex-col  justify-center items-center">
+            <button
+                class="bg-blue-500 hover:scale-105 focus:scale-105 transition-all rounded-lg hover:bg-gray-500 hover:text-black focus:bg-gray-500 focus:text-black px-10 text-white py-2"
+                onclick="window.location.href='https://docs.google.com/forms/d/e/1FAIpQLSdN3vdC1cppybm55mSSTy9Rn679U78NYvx9MV5mMCKc88PgYQ/viewform'">Reserpasi
+                Hotel</button>
+            <br>
+            <h1 class="font-medium">( Hanya Take Kamar, Untuk Pemesanan dan Pembayaran hubungi nomor ini <span><a
+                        href="https://wa.link/qavgnl" class="text-blue-400">0877 7292 1119</a></span> ) </h1>
+        </div>
+    </div>
     <div id="lokasi" class="teknis relative w-full h-96 ">
         <div
             class="text absolute inset-0 m-5  py-38  lg:py-0 flex flex-col lg:items-center justify-center  lg:bottom-15 z-10">
@@ -419,10 +426,6 @@
             </div>
         </div>
         <img src="assets/bgBlue.svg" class="w-full h-96 object-cover" alt="">
-
-
-
-
     </div>
 
 

@@ -46,6 +46,7 @@
         </div>
         {{-- == form input team for jadwal == --}}
 
+        {{-- == view body table team ==  --}}
         <div class="w-full lg:w-2/3 m-1 bg-white shadow-lg text-lg rounded-sm border border-gray-200">
             <div class="overflow-x-auto rounded-lg p-3">
                 <table class="table-auto w-full border-collapse border border-gray-300" id="teamTable">
@@ -55,6 +56,7 @@
                             <th class="p-2 border border-gray-300 text-left">Nama Team</th>
                             <th class="p-2 border border-gray-300 text-left">Peserta 1 </th>
                             <th class="p-2 border border-gray-300 text-left">Peserta 2</th>
+                            <th class="p-2 border border-gray-300 text-center">Lomba</th>
                             <th class="p-2 border border-gray-300 text-center">Action</th>
                         </tr>
                     </thead>
@@ -65,6 +67,9 @@
 
             </div>
         </div>
+        {{-- == end view body table team == --}}
+
+        {{-- == internal script javascript == --}}
         <script>
             $(document).ready(function() {
                 // Load initial data
@@ -92,28 +97,38 @@
                         success: function(response) {
                             let rows = '';
                             $.each(response, function(index, team) {
+                                if (team.race_mismatch) {
+                                    // Tampilkan alert jika race tidak sesuai
+                                    alert('Participant tidak sesuai dengan race pada tim ' + team
+                                        .nama_team);
+                                }
                                 rows += `<tr>
-                                    <td class="p-2 border border-gray-300">${index++}</td> <!-- Nomor urut -->
-                                    <td>${team.nama_team}</td>
-                                    <td>${team.participant1_name}</td>
-                                    <td>${team.participant2_name}</td>
-                                     <td class="p-2 border border-gray-300 text-center">
-                            <div class="flex justify-center">
-                                <button class="rounded-md hover:bg-red-100 text-red-600 p-2 flex justify-between items-center deleteTeam" data-id="${team.id}">
-                                    <span>
-                                        <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </span> Delete
-                                </button>
-                            </div>
-                        </td>
-                                </tr>`;
+                    <td class="p-2 border border-gray-300">${index + 1}</td> <!-- Nomor urut -->
+                    <td>${team.nama_team}</td>
+                    <td>${team.participant1_name}</td>
+                    <td>${team.participant2_name}</td>
+                    <td class="p-2 border border-gray-300 text-center">
+                        ${team.race_name}
+                    </td>
+                    <td class="p-2 border border-gray-300 text-center">
+                        <div class="flex justify-center">
+                            <button class="rounded-md hover:bg-red-100 text-red-600 p-2 flex justify-between items-center deleteTeam" data-id="${team.id}">
+                                <span>
+                                    <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </span> Delete
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
                             });
                             $('#teamTable tbody').html(rows);
                         }
                     });
                 }
+
+
 
                 $(document).on('click', '.deleteTeam', function() {
                     const teamId = $(this).data('id');
@@ -136,5 +151,7 @@
 
             });
         </script>
+        {{-- == end internal script == --}}
+
     </div>
 </x-panel.app>

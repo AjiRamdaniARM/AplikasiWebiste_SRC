@@ -238,7 +238,7 @@
                 <a>
                     <div class="content">
                         <!--<img src="assets/img/iklan-1.jpeg" alt="">-->
-                        <img src="{{ asset('assets/Hidup.png') }}" alt="">
+                        <img src="{{ asset('assets/iklan/new-iklan.png') }}" alt="">
                     </div>
                 </a>
 

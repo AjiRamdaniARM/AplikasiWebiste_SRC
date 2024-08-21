@@ -10,6 +10,7 @@ class DataTeam extends Model
     use HasFactory;
 
     protected $fillable = [
+        'id_user',
         'nama_team',
         'id_participants_1',
         'id_participants_2'

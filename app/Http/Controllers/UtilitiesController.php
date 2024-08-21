@@ -24,6 +24,7 @@ class UtilitiesController extends Controller
         }
     }
 
+
     public function reverse(Request $request)
     {
         try {

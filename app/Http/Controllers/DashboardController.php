@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use App\Models\Notif;
 use App\Models\Participant;
+use App\Models\ProjectOnlines;
 use App\Models\Race;
 use App\Models\User;
 use App\Models\Vourcher;
@@ -26,8 +27,10 @@ class DashboardController extends Controller
             ->join('races', 'participants.race_id', '=', 'races.id')
             ->join('project_onlines', 'participants.id_upload', '=', 'project_onlines.id')
             ->where('races.category_id', 11)
-            ->select('participants.*', 'participants.id as id_peserta', 'races.category_id', 'races.id as race_id', 'project_onlines.*', 'project_onlines.id as online_id')
+            ->select('participants.*', 'participants.id as id_peserta', 'races.category_id', 'races.id as race_id', 'project_onlines.*', 'project_onlines.id as online_id','participants.id_user as userID')
             ->get();
+
+        $getSeleksiUpload = ProjectOnlines::where('seleksi', 2)->get();
 
         $data = Race::all();
         $data2 = Race::all()->count();
@@ -37,6 +40,12 @@ class DashboardController extends Controller
             ->join('races', 'invoice_races.race_id', '=', 'races.id')
             ->whereIn('invoice_id', $getDataInvoice->pluck('id'))
             ->count();
+
+            $getDataSeleksiPay = DB::table('participants')
+            ->join('invoices', 'participants.invoice_seleksi_2' , '=','invoices.name')
+            ->where('id_user', '=', $user->id)
+            ->where('invoices.id_seleksi', 1)
+            ->first();
 
         $item = Invoice::where('user_id', $user->id)->count();
         $itemAll = Invoice::all()->count();
@@ -52,7 +61,13 @@ class DashboardController extends Controller
         $kodeVoucher = substr(bin2hex(random_bytes(5)), 0, 16);
         $idVoucher = 'sukarobot_'.$kodeVoucher;
 
-        return view('dashboard.index', compact('voucher', 'lv2', 'itemAll', 'pesertaOnline', 'participants', 'data', 'data2', 'races', 'item', 'notif', 'user', 'idVoucher', 'participantsUser', 'dataUser', 'getRaceOnline', 'getParticipantSeleksi2'));
+        // == ajax response json input form == //
+        $count = ProjectOnlines::where('seleksi',2)->count();
+        if ($request->ajax()) {
+        return response()->json(['total' => $count]);
+        }
+
+        return view('dashboard.index', compact('voucher', 'lv2', 'itemAll', 'pesertaOnline', 'participants', 'data', 'data2', 'races', 'item', 'notif', 'user', 'idVoucher', 'participantsUser', 'dataUser', 'getRaceOnline', 'getParticipantSeleksi2','getDataSeleksiPay', 'getSeleksiUpload'));
     }
 
     public function seleksi(Request $request, $id_peserta)
@@ -68,11 +83,11 @@ class DashboardController extends Controller
         $race = Race::where('category_id', 11)->first(); // Mengambil objek race
         $get = Participant::where('id', $id_peserta)->first();
         $seleksi->id_seleksi = $request->input('seleksi');
-        $notif = Notif::where('id_user', $request->input('id_user'))->where('id_peserta', $id_peserta)->first();
+        $notif = Notif::where('id_user', $request->id_user)->where('id_peserta', $id_peserta)->first();
 
         if (is_null($notif)) {
             $notif = new Notif;
-            $notif->id_user = $request->input('id_user');
+            $notif->id_user = $request->id_user;
             $notif->id_peserta = $id_peserta;
         }
 
@@ -152,6 +167,7 @@ class DashboardController extends Controller
 
         return view('dashboard.upload.uploadProject', compact('pesertaOnline'));
     }
+
 
     public function paySeleksi(Request $request)
     {

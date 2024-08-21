@@ -13,6 +13,8 @@ class ProjectOnlines extends Model
         'name_project',
         'status',
         'id_participants',
+        'id_user',
+        'seleksi'
     ];
 
     public function participant()
